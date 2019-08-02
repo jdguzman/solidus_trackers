@@ -7,7 +7,7 @@ class Spree::Tracker < ActiveRecord::Base
   def self.current(store = nil)
     return if !store
     if store.is_a?(Spree::Store)
-      Spree::Tracker.where(active: true, store_id: store).first
+      Spree::Tracker.where(active: true, store_id: current_store.id)
     else
       # TODO: Remove in 2.0
       ActiveSupport::Deprecation.warn <<-EOS.squish, caller
@@ -16,7 +16,7 @@ class Spree::Tracker < ActiveRecord::Base
       EOS
       Spree::Tracker.where(active: true).joins(:store).where(
         "spree_stores.code = ? OR spree_stores.url LIKE ?",
-        store, "%#{store}%"
+        current_store, "%#{store}%"
       ).first
     end
   end
@@ -28,7 +28,7 @@ class Spree::Tracker < ActiveRecord::Base
     return if !store
 
     Spree::Tracker.where(active: true,
-                         store_id: store,
+                         store_id: current_store.id,
                          tracker_type: type).first
   end
 end
