@@ -1,6 +1,7 @@
 class Spree::Tracker < ActiveRecord::Base
-  belongs_to :store
-
+  belongs_to :store, class_name: 'Spree::Store', foreign_key: 'store_id'
+  
+  validates :store_id, presence: true
   validates :tracker_type, presence: true
 
   def self.current(store = nil)
