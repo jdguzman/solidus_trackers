@@ -29,6 +29,9 @@ class Spree::Admin::TrackersController < Spree::Admin::ResourceController
         end
       end
 
+      def edit
+      end
+
       def update
         if @tracker.update_attributes(tracker_params)
           flash[:success] = "Tracker updated"
@@ -57,7 +60,9 @@ class Spree::Admin::TrackersController < Spree::Admin::ResourceController
     end
 
     def find_tracker
-      @tracker = current_store.trackers.find(params[:id])
+      # @tracker = current_store.trackers.find(params[:id])
+      # @tracker = Spree::Tracker.find(params[:id]).where(store_id: current_store.id)
+      @tracker = Spree::Tracker.where(store_id: current_store.id).find(params[:id])
     end
 
 end
