@@ -60,8 +60,6 @@ class Spree::Admin::TrackersController < Spree::Admin::ResourceController
     end
 
     def find_tracker
-      # @tracker = current_store.trackers.find(params[:id])
-      # @tracker = Spree::Tracker.find(params[:id]).where(store_id: current_store.id)
       @tracker = Spree::Tracker.where(store_id: current_store.id).find(params[:id])
     end
 
