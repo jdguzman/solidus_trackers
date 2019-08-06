@@ -1,23 +1,19 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'spec_helper'
 
-RSpec.describe 'Trackers Controller', type: :request do
+describe 'Trackers Controller', type: :request do
 
   describe 'GET /admin/trackers' do
     context 'when multiple stores with trackers exist' do
-      let!(:admin_user) {
-        create(:engine_platform_user, password: 'password')
-      }
-      let(:team1) { admin_user.team }
-      let(:store1) { team1.store }
+      stub_authorization!
+
+      let!(:store1) { create(:store) }
       let!(:tracker1) { create(:tracker, store: store1) }
-      let!(:team2) { create(:team, :with_store) }
-      let!(:store2) { team2.store }
+      let!(:store2) { create(:store) }
       let!(:tracker2) { create(:tracker, store: store2) }
 
       before do
-        sign_in admin_user
         get '/admin/trackers'
       end
 
@@ -34,18 +30,17 @@ RSpec.describe 'Trackers Controller', type: :request do
 
   describe 'POST /admin/trackers/new' do
     context 'when multiple stores exist' do
-      let!(:admin_user) {
-        create(:admin_user, password: 'password')
-      }
+      stub_authorization!
+
       let!(:tracker) {
         create(:tracker, store: store1)
       }
-      let!(:store1) { create(:store, :with_business_address) }
+      let!(:store1) { create(:store) }
       let!(:tracker1) {
         create(:tracker, store: store1)
       }
 
-      let!(:store2) { create(:store, :with_business_address) }
+      let!(:store2) { create(:store) }
 
       let(:create_params) {
         {
@@ -61,7 +56,6 @@ RSpec.describe 'Trackers Controller', type: :request do
       }
 
       it 'associates the tracker with the current store' do
-        sign_in admin_user
         expect {
           post "/admin/trackers", params: create_params
         }.to change {
@@ -74,14 +68,13 @@ RSpec.describe 'Trackers Controller', type: :request do
 
   describe 'PUT /admin/trackers' do
     context 'when the tracker belongs to another store' do
-      let!(:admin_user) {
-        create(:admin_user, password: 'password')
-      }
+      stub_authorization!
+
       let!(:tracker) {
         create(:tracker)
       }
-      let(:store1) { create(:store, :with_business_address) }
-      let(:store2) { create(:store, :with_business_address) }
+      let!(:store1) { create(:store) }
+      let!(:store2) { create(:store) }
       let!(:tracker2) {
         create(:tracker)
       }
@@ -101,7 +94,6 @@ RSpec.describe 'Trackers Controller', type: :request do
       }
 
       before do
-        sign_in admin_user
         put "/admin/trackers/#{tracker2.id}", params: update_params
       end
 
