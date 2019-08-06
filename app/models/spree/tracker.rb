@@ -3,6 +3,7 @@ class Spree::Tracker < ActiveRecord::Base
 
   validates :store_id, presence: true
   validates :tracker_type, presence: true
+  # byebug
 
   # def self.current(store = nil)
   #   return if !store
@@ -23,13 +24,27 @@ class Spree::Tracker < ActiveRecord::Base
   # end
   # class << self
   #   deprecate :current, deprecator: Spree::Deprecation
+  #   # byebug
+  # end
+  # def self.active(active = nil)
+  #   Spree::Tracker.where(active: active,
+  #                       #  store: current_store,
+  #                        store_id: store.id,
+  #                        tracker_type: type).first
   # end
 
-  def self.by_type #(store = nil, type = 'google_analytics')
-    # return if !store
+  def self.current_store
     Spree::Tracker.where(active: true,
-                         store: store,
-                         store_id: current_store.id,
+                        #  store: current_store,
+                         store_id: store.id,
+                         tracker_type: type).first
+  end
+
+  def self.by_type(store = current_store, type = 'google_analytics')
+    # byebug
+    Spree::Tracker.where(active: true,
+                        #  store: current_store,
+                         store_id: store.id,
                          tracker_type: type).first
   end
 end
