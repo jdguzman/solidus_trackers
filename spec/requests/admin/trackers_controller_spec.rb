@@ -76,7 +76,7 @@ describe 'Trackers Controller', type: :request do
       let!(:store1) { create(:store) }
       let!(:store2) { create(:store) }
       let!(:tracker2) {
-        create(:tracker)
+        create(:tracker, store: store2)
       }
 
       let(:update_params) {
@@ -88,8 +88,8 @@ describe 'Trackers Controller', type: :request do
       let(:tracker_params) {
         {
           name: 'Another Tracker',
-          tracker_id: tracker2.id,
-          store_id: store2.id,
+          tracker_id: tracker.id,
+          store_id: store1.id,
         }
       }
 
@@ -97,12 +97,12 @@ describe 'Trackers Controller', type: :request do
         put "/admin/trackers/#{tracker2.id}", params: update_params
       end
 
-      it 'returns a 404 for trackers from the wrong store' do
-        expect(response.status).to eq(404)
+      it 'redirects to the trackers index page' do
+        expect(response.status).to redirect_to('/admin/trackers')
       end
 
       it "does not update the other stores' tracker" do
-          expect(tracker2.reload.name).to_not eq(tracker)
+          expect(tracker2.reload.name).to_not eq('Another Tracker')
       end
     end
 
