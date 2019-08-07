@@ -3,7 +3,6 @@
 require 'spec_helper'
 
 describe 'Trackers Controller', type: :request do
-
   describe 'GET /admin/trackers' do
     context 'when multiple stores with trackers exist' do
       stub_authorization!
@@ -25,7 +24,6 @@ describe 'Trackers Controller', type: :request do
         expect(assigns(:trackers)).to_not include(tracker2)
       end
     end
-
   end
 
   describe 'POST /admin/trackers/new' do
@@ -63,7 +61,6 @@ describe 'Trackers Controller', type: :request do
         }.by(1)
       end
     end
-
   end
 
   describe 'PUT /admin/trackers' do
@@ -105,6 +102,5 @@ describe 'Trackers Controller', type: :request do
           expect(tracker2.reload.name).to_not eq('Another Tracker')
       end
     end
-
   end
 end

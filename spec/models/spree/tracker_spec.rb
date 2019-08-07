@@ -1,14 +1,12 @@
 require 'spec_helper'
 
 describe Spree::Tracker, type: :model do
-
   let!(:store1) { create(:store) }
   let!(:tracker1) { create(:tracker, store: store1, tracker_type: 'google_manager') }
   let(:store2) { create(:store, code: 'STORE2', url: 'realfakedoors.com') }
   let!(:tracker2) { create(:tracker, store: store2) }
 
   describe "current store" do
-
     it "returns the first active tracker for the current store" do
       expect(Spree::Tracker.first).to eq(tracker1)
     end
@@ -19,7 +17,7 @@ describe Spree::Tracker, type: :model do
 
     xit "does not return an inactive tracker for the current store" do
       tracker1.update_attribute(:active, false)
-      expect(tracker1).to eq(nil)
+      expect(tracker1.current_store).to eq(nil)
     end
 
     xit "does not return an inactive tracker for the other store" do
@@ -53,7 +51,6 @@ describe Spree::Tracker, type: :model do
   end
 
   describe "by_type" do
-
     it "returns the first active tracker for the current store" do
       expect(Spree::Tracker.by_type(store1, tracker1.tracker_type)).to eq(tracker1)
     end
