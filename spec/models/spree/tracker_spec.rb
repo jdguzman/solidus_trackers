@@ -1,82 +1,71 @@
 require 'spec_helper'
 
 describe Spree::Tracker, type: :model do
-  let!(:store1) { create(:store) }
-  let!(:tracker1) { create(:tracker, store: store1, tracker_type: 'google_manager') }
-  let(:store2) { create(:store, code: 'STORE2', url: 'realfakedoors.com') }
-  let!(:tracker2) { create(:tracker, store: store2) }
+  let!(:store) { create(:store) }
+  let!(:tracker) { create(:tracker, store: store, tracker_type: 'google_manager') }
+  let(:other_store) { create(:store, code: 'STORE2', url: 'realfakedoors.com') }
+  let!(:other_tracker) { create(:tracker, store: other_store) }
 
-  describe "current store" do
-    it "returns the first active tracker for the current store" do
-      expect(Spree::Tracker.first).to eq(tracker1)
+  describe "current" do
+    it "returns nil if no store passed in argument" do
+      expect(Spree::Tracker.current).to eq(nil)
     end
 
-    it "does not return the first active tracker for the other store" do
-      expect(Spree::Tracker.first).to_not eq(tracker2)
+    it "returns the first active tracker" do
+      expect(Spree::Tracker.current(store)).to eq(tracker)
     end
 
-    xit "does not return an inactive tracker for the current store" do
-      tracker1.update_attribute(:active, false)
-      expect(tracker1.current_store).to eq(nil)
+    it "does not return an inactive tracker" do
+      tracker.update_attribute(:active, false)
+      expect(Spree::Tracker.current(store)).to eq(nil)
     end
 
-    xit "does not return an inactive tracker for the other store" do
-      tracker2.update_attribute(:active, false)
-      expect(tracker2).to eq(nil)
+    it "finds tracker by store" do
+      expect(Spree::Tracker.current(store)).to eq(tracker)
     end
 
-    it "finds tracker by current store" do
-      expect(tracker1.store).to eq(store1)
+    it "finds tracker based on store code" do
+      aggregate_failures do
+        expect(ActiveSupport::Deprecation).to receive(:warn)
+        expect(Spree::Tracker.current('STORE2')).to eq(other_tracker)
+      end
     end
 
-    it "does not find the tracker by other store" do
-      expect(tracker1.store).to_not eq(store2)
-    end
-
-    it "finds tracker based on current store's code" do
-        expect(store1.code).to eq(tracker1.store.code)
-    end
-
-    it "does not find the tracker based on other store's code" do
-        expect(store2.code).to_not eq(tracker1.store.code)
-    end
-
-    it "finds tracker based on the current store's url" do
-        expect(store1.url).to eq(tracker1.store.url)
-    end
-
-    it "does not find the tracker based on the other store's url" do
-        expect(store2.url).to_not eq(tracker1.store.url)
+    it "finds tracker based on store url" do
+      aggregate_failures do
+        expect(ActiveSupport::Deprecation).to receive(:warn)
+        expect(Spree::Tracker.current(store.url)).to eq(tracker)
+      end
     end
   end
 
   describe "by_type" do
-    it "returns the first active tracker for the current store" do
-      expect(Spree::Tracker.by_type(store1, tracker1.tracker_type)).to eq(tracker1)
+    it "returns nil if no store passed in argument" do
+      expect(Spree::Tracker.by_type).to eq(nil)
     end
 
-    it "does not return the first active tracker for the other store" do
-      expect(Spree::Tracker.by_type(store1, tracker1.tracker_type)).to_not eq(tracker2)
+    it "returns the first active tracker" do
+      expect(Spree::Tracker.by_type(store, tracker.tracker_type)).to eq(tracker)
     end
 
-    it "does not return an inactive tracker for the current store" do
-      tracker1.update_attribute(:active, false)
-      expect(Spree::Tracker.by_type(store1, tracker1.tracker_type)).to eq(nil)
+    it "does not return an inactive tracker" do
+      tracker.update_attribute(:active, false)
+      expect(Spree::Tracker.by_type(store, tracker.tracker_type)).to eq(nil)
     end
 
-    it "does not return an inactive tracker for the other store" do
-      tracker2.update_attribute(:active, false)
-      expect(Spree::Tracker.by_type(store2, tracker2.tracker_type)).to eq(nil)
+    it "finds tracker by store" do
+      tracker.update_attribute(:tracker_type, 'google_analytics')
+      expect(Spree::Tracker.by_type(store, tracker.tracker_type)).to eq(tracker)
+    end
+  end
+
+  describe 'by current store' do
+    it 'returns only the tracker that belongs to the current store' do
+      expect(tracker.store).to eq(store)
     end
 
-    it "finds tracker by the current store" do
-      tracker1.update_attribute(:tracker_type, 'google_analytics')
-      expect(Spree::Tracker.by_type(store1, tracker1.tracker_type)).to eq(tracker1)
-    end
-
-    it "does not find the tracker by the other store" do
-      tracker1.update_attribute(:tracker_type, 'google_analytics')
-      expect(Spree::Tracker.by_type(store1, tracker1.tracker_type)).to_not eq(tracker2)
+    it 'does not return the tracker that belongs to the other store' do
+      expect(other_tracker.store).to_not eq(store)
     end
   end
 end
