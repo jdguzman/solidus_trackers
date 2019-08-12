@@ -16,10 +16,6 @@ class Spree::Admin::TrackersController < Spree::Admin::ResourceController
     def create
       @tracker = Spree::Tracker.new(tracker_params)
 
-      if @tracker.respond_to?(:store_id=)
-        @tracker[:store_id] = current_store.id
-      end
-
       if @tracker.save
         flash[:success] = "Tracker created"
         redirect_to admin_trackers_path
@@ -54,7 +50,7 @@ class Spree::Admin::TrackersController < Spree::Admin::ResourceController
   private
 
     def tracker_params
-      params.require(:tracker).permit(:analytics_id, :active, :store_id, :tracker_type, :name, :script, :options, :app_id)
+      params.require(:tracker).permit(:id, :analytics_id, :active, :store_id, :tracker_type, :name, :script, :options, :app_id)
     end
 
     def find_tracker
