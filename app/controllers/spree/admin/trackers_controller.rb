@@ -24,29 +24,6 @@ class Spree::Admin::TrackersController < Spree::Admin::ResourceController
       end
     end
 
-    def edit
-    end
-
-    def update
-      if @tracker.update_attributes(tracker_params)
-        flash[:success] = "Tracker updated"
-        redirect_to admin_trackers_path
-      else
-        render :edit
-      end
-    end
-
-    def destroy
-      @tracker.destroy
-
-      flash[:success] = "Tracker '#{@tracker.name}' deleted"
-
-      respond_with(@tracker) do |format|
-        format.html { redirect_to admin_trackers_path }
-        format.js { render_js_for_destroy }
-      end
-    end
-
   private
 
     def tracker_params
